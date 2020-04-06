@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.xr.mapper.UserMapper">
+
+    <!--
+    LRU：最少使用原则，移除最长时间不使用的对象
+    FIFO：先进先出原则，按照对象进入缓存顺序进行回收
+    SOFT：软引用，移除基于垃圾回收器状态和软引用规则的对象
+    WEAK：弱引用，更积极的移除移除基于垃圾回收器状态和弱引用规则的对象
+    -->
+    <cache eviction="LRU" type="com.xr.config.redis.RedisCache"
+           flushInterval="600000" size="4096" readOnly="false"></cache>
+
+    <select id="findUserById" useCache="true" resultType="UserBean">
+        select * from dbo.Base_Users where user_id=#{userId};
+    </select>
+
+    <select id="findStockById" useCache="true" resultType="Stock">
+        select * from dbo.stock where stock_id=#{stockid};
+    </select>
+
+    <select id="findAllUsers" resultMap="collectionMap">
+        select * from dbo.Base_Users;
+    </select>
+
+    <select id="findAllUsersFlushCache" flushCache="true" resultMap="collectionMap">
+        select * from dbo.Base_Users;
+    </select>
+
+    <resultMap id="collectionMap" type="UserBean">
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="user_age" property="userAge" jdbcType="INTEGER"/>
+        <result column="user_alias" property="userAlias" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="insertUser" parameterType="UserBean">
+        insert into dbo.Base_Users values(#{userName},#{userAge},#{userAlias})
+    </insert>
+
+    <update id="updateUser">
+        update dbo.Base_Users set user_alias='N' where user_name='jj1';
+    </update>
+
+    <update id="updateUserById">
+        update dbo.Base_Users set user_alias='N' where user_id=#{userId};
+    </update>
+    <update id="updateStockById">
+        update dbo.stock set stock_name='stock_changed' where stock_id=#{stockid};
+    </update>
+
+    <insert id="batchInsert">
+        insert into dbo.Base_Users
+        values
+        <foreach collection="userlist" item="user" index="index" separator=",">
+            (
+            #{user.userName},
+            #{user.userAge},
+            #{user.userAlias}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

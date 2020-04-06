@@ -1,0 +1,32 @@
+#默认使用配置
+spring:
+  profiles:
+    active: dev
+  cache:
+    ehcache:
+      config: classpath:ehcache.xml
+  redis:
+    host: 192.168.1.101
+    port: 6379
+    max-idle: 1
+    max-total: 5
+    password: 1234
+
+
+  #公共配置与profiles选择无关
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.xr.entity
+  #configuration:
+   #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+   #cache-enabled: true
+   #use-column-label: true
+   #use-actual-param-name: true
+   #map-underscore-to-camel-case: true
+
+server:
+  #端口号
+  port: 8888
+
+logging:
+  config:  classpath:logback.xml
